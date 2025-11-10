@@ -6,6 +6,7 @@ use App\Http\Controllers\PublicProfileController;
 use App\Http\Controllers\ClapController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FollowerController;
+use App\Http\Controllers\CategoryController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -21,7 +22,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('posts/{post}', [PostController::class, 'update'])->name('post.update');
     Route::get('my-posts', [PostController::class, 'myPosts'])->name('myPosts');
     Route::post('/follow/{user}', [FollowerController::class, 'follow'])->name('follow.toggle');
+    
 });
+Route::get('/category/{category}', [PostController::class, 'category'])->name('posts.byCategory');
 Route::middleware('auth')->group(function () {
     Route::post('/clap/{id}', [ClapController::class, 'clap'])->name('clap.store');
     Route::get('/posts/{id}/clap-count', [ClapController::class, 'count'])->name('posts.clap.count');
