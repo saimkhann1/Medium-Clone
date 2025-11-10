@@ -25,7 +25,7 @@ class PostFactory extends Factory
         'category_id' => \App\Models\Category::inRandomOrder()->first()?->id ?? \App\Models\Category::factory(),
         'user_id' => 1, // ya \App\Models\User::inRandomOrder()->first()?->id
         'published_at' => $this->faker->optional()->dateTime(),
-        'images' => $this->faker->imageUrl(),
+        // 'images' => $this->faker->imageUrl(),
     ];
 }
 

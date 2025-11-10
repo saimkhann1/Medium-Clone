@@ -4,13 +4,13 @@
             <h1 class="text-3xl mb-4 ">Update Post: <strong class="font-bold">{{ $post->title }}</strong></h1>
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <form action="{{ route('posts.update') }}" enctype="multipart/form-data" method="POST">
+                    <form action="{{ route('post.update', $post->id) }}" enctype="multipart/form-data" method="POST">
                         @csrf
-                        @method('PATCH')
+                        @method('PUT')
                         @if ($post->imageUrl())
                             <div class="mb-8">
                                 <img src="{{ $post->imageUrl() }}" class="w-24 h-24 object-cover rounded-full"
-                                    alt="{{ $post->title }}"  class="w-full"/>
+                                    alt="{{ $post->title }}" class="w-full" />
                             </div>
                         @endif
                         {{-- Image Upload --}}
@@ -31,19 +31,22 @@
 
                         {{-- Category --}}
                         <div class="mt-4">
-                            <x-input-label for="category_id" :value="__('Category', ['category' => $post->category_id])" />
+                            <x-input-label for="category_id" :value="__('Category')" />
+
                             <select id="category_id" name="category_id"
                                 class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                                 <option value="">Select a Category</option>
                                 @foreach ($categories as $category)
                                     <option value="{{ $category->id }}"
-                                        {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                        {{ old('category_id', $post->category_id) == $category->id ? 'selected' : '' }}>
                                         {{ $category->name }}
                                     </option>
                                 @endforeach
                             </select>
+
                             <x-input-error :messages="$errors->get('category_id')" class="mt-2" />
                         </div>
+
 
                         {{-- Content --}}
                         <div class="mt-4">
@@ -53,12 +56,19 @@
                                 rows="3" required>{{ old('content', $post->content) }}</textarea>
                             <x-input-error :messages="$errors->get('content')" class="mt-2" />
                         </div>
-                          <div class="mt-4">
-                            <x-input-label for="published_at" :value="__('Published_at')" />
-                            <x-text-input id="published_at" class="block mt-1 w-full" type="datetime-local" name="published_at"
-                                :value="old('published_at')" required autofocus />
-                            <x-input-error :messages="$errors->get('published_at', $post->published_at)" class="mt-2" />
+                        {{-- Published At --}}
+                        <div class="mt-4">
+                            <x-input-label for="published_at" :value="__('Published At')" />
+
+                            <x-text-input id="published_at" class="block mt-1 w-full" type="datetime-local"
+                                name="published_at" :value="old(
+                                    'published_at',
+                                    $post->published_at ? $post->published_at->format('Y-m-d\TH:i') : '',
+                                )" required autofocus />
+
+                            <x-input-error :messages="$errors->get('published_at')" class="mt-2" />
                         </div>
+
                         {{-- Submit Button --}}
                         <x-primary-button class="mt-4">
                             {{ __('Submit') }}

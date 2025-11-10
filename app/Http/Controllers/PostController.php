@@ -15,18 +15,25 @@ class PostController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        $user = Auth::user();
-        $query=Post::latest();
-        if($user){
-            $ids=$user->following->pluck('users.id');
-            $query->whereIn('user_id',$ids)->where('published_at','<',now());
+ public function index()
+{
+    $user = Auth::user();
+    $query = Post::latest();
+
+    if ($user) {
+        $ids = $user->following->pluck('id');
+        if ($ids->isNotEmpty()) {
+            $query->whereIn('user_id', $ids)
+                  ->where('published_at', '<', now());
         }
-        $categories = Category::all();
-        $posts = $query->paginate(5);
-        return view('posts.index', compact('categories', 'posts', 'user'));
     }
+
+    $categories = Category::all();
+    $posts = $query->paginate(5);
+
+    return view('posts.index', compact('categories', 'posts', 'user'));
+}
+
 
     /**
      * Show the form for creating a new resource.
@@ -113,16 +120,25 @@ class PostController extends Controller
         return redirect()->route('dashboard')->with('success', 'Post deleted successfully!');
     }
     public function category(Category $category)
-    {
-        $user = Auth::user();
-        $categories = Category::all();
-        $posts = Post::where('category_id', $category->id)->where('published_at','<',now())->latest()->paginate(5);
-        if($user){
-            $ids=$user->following->pluck('users.id');
-            $posts = Post::where('category_id', $category->id)->whereIn('user_id',$ids)->where('published_at','<',now())->latest()->paginate(5);
+{
+    $user = Auth::user();
+    $categories = Category::all();
+
+    $query = Post::where('category_id', $category->id)
+                 ->where('published_at', '<', now())
+                 ->latest();
+
+    if ($user) {
+        $ids = $user->following->pluck('users.id');
+        if ($ids->isNotEmpty()) {
+            $query->whereIn('user_id', $ids);
         }
-        return view('posts.index', compact('categories', 'posts', 'category'));
     }
+
+    $posts = $query->paginate(5);
+
+    return view('posts.index', compact('categories', 'posts', 'category'));
+}
     public function myPosts()
     {
         $user = Auth::user();

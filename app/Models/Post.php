@@ -55,18 +55,18 @@ class Post extends Model implements HasMedia
     {
         return $this->hasMany(Clap::class);
     }
-
-   public function imageUrl($conversionName = '')
+public function imageUrl()
 {
-    $media = $this->getFirstMedia('images'); // 👈 use correct collection name
+    $url = $this->getFirstMediaUrl('image') ?: $this->getFirstMediaUrl();
 
-    if ($media) {
-        return $conversionName
-            ? $media->getUrl($conversionName)
-            : $media->getUrl();
+    if ($url && $url !== '') {
+        return $url;
     }
 
-    // fallback if no image is attached
+    if ($this->image) {
+        return asset('storage/seed-images/' . $this->image);
+    }
+
     return asset('images/default-post.jpg');
 }
-}   
+}                       
